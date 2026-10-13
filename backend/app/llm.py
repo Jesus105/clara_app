@@ -90,6 +90,7 @@ No agregues campos adicionales. Estructura:
             response = client.post("https://openrouter.ai/api/v1/chat/completions", headers=headers(), json={
                 "model": settings().openrouter_model, "temperature": 0.2, "max_tokens": 1800,
                 "response_format": {"type": "json_object"},
+                "provider": {"require_parameters": True, "max_price": {"prompt": 0.2, "completion": 0.5, "request": 0}},
                 "messages": [{"role": "system", "content": instruction}, {"role": "user", "content": input_text}],
             })
         except httpx.HTTPError:

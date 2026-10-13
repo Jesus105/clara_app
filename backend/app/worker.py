@@ -1,4 +1,5 @@
 import logging
+import math
 import time
 from datetime import timedelta
 from sqlalchemy import select, update, delete
@@ -37,7 +38,8 @@ def process_once():
         # The budget row serializes all worker instances and reservations survive crashes.
         budget = db.scalar(select(Config).where(Config.key == "budget").with_for_update())
         value = dict(budget.value)
-        if value.get("reserved_usd", 0) + RESERVATION_USD > settings().llm_max_total_usd:
+        current_reservation = max(value.get("reserved_usd", 0), value.get("actual_usd", 0))
+        if current_reservation + RESERVATION_USD > settings().llm_max_total_usd:
             job.status = "failed"
             job.error = "Límite de presupuesto reservado alcanzado."
             db.get(Lead, job.lead_id).status = "failed"
@@ -47,7 +49,7 @@ def process_once():
         if not claimed.rowcount:
             db.rollback()
             return False
-        value["reserved_usd"] = round(value.get("reserved_usd", 0) + RESERVATION_USD, 6)
+        value["reserved_usd"] = math.ceil((current_reservation + RESERVATION_USD) * 1_000_000_000) / 1_000_000_000
         budget.value = value
         db.commit()
         db.refresh(job)
@@ -74,7 +76,7 @@ def process_once():
             if isinstance(cost, (int, float)) and 0 <= cost < RESERVATION_USD:
                 budget = db.scalar(select(Config).where(Config.key == "budget").with_for_update())
                 value = dict(budget.value)
-                value["reserved_usd"] = round(max(0, value["reserved_usd"] - RESERVATION_USD + cost), 6)
+                value["reserved_usd"] = math.ceil(max(0, value["reserved_usd"] - RESERVATION_USD + cost) * 1_000_000_000) / 1_000_000_000
                 value["actual_usd"] = value.get("actual_usd", 0) + cost
                 budget.value = value
         except LLMError as exc:

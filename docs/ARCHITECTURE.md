@@ -38,6 +38,8 @@ Tope: US$3. Reserva: US$0.02 por intento. La fila del presupuesto se bloquea y l
 
 La app guarda el costo exacto cuando OpenRouter lo reporta; costo/reservas y consumo global son conceptos diferentes. El consumo global incorpora otros usos de la misma key. Un tope configurado también en OpenRouter y una key exclusiva son necesarios para un límite global fuerte frente a clientes externos.
 
+Además del catálogo, el payload exige `provider.max_price`: US$0.20 por millón de tokens de entrada, US$0.50 por millón de salida y cargo por request US$0. Esto limita también el proveedor seleccionado por OpenRouter. Las reservas se redondean hacia arriba a nueve decimales para evitar subestimar consumo por redondeo.
+
 ## Seguridad y alcance
 
 Las claves se leen desde entorno y nunca se incluyen en build frontend, cookies o logs. `.env`, `.local`, bases y secretos están excluidos de Git y del contexto Docker. El login utiliza contraseña de workspace y cookie firmada HttpOnly; producción obliga a cambiar credenciales por defecto y cookie Secure. Una cookie firmada no cifra su contenido, que solo incluye la identidad de demo.

@@ -98,6 +98,8 @@ La aplicación permite **US$3 de consumo total de la key**, contando también us
 3. Verifica que el modelo pertenezca a una lista económica y que el costo máximo de entrada/salida sea menor que la reserva. Limita entrada y salida; no usa herramientas ni búsqueda de pago.
 4. Si OpenRouter reporta costo exacto, ajusta la reserva; si falta o hay un fallo, conserva la reserva por precaución.
 
+La solicitud también limita el precio del proveedor a US$0.20/millón de tokens de entrada, US$0.50/millón de salida y cero cargo por solicitud. Si no hay un proveedor compatible, falla sin usar una alternativa más cara. [Control de precios del proveedor](https://openrouter.ai/docs/guides/routing/provider-selection).
+
 Este control limita las llamadas realizadas por la app. Otros clientes que compartan la key pueden consumir créditos fuera de ella. Para un tope global adicional configura un límite de US$3 para esta key en OpenRouter y úsala exclusivamente para la demo. El runtime nunca recibe la credencial de Render.
 
 ## Pruebas

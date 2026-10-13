@@ -36,6 +36,8 @@ def test_real_adapter_failure_modes(monkeypatch, mode):
     def handle(request):
         if request.url.path.endswith('/key'): return httpx.Response(200, json={"data": {"usage": 0}})
         if request.url.path.endswith('/models'): return httpx.Response(200, json={"data": [{"id": settings().openrouter_model, "pricing": {"prompt": "0.0000001", "completion": "0.0000004"}}]})
+        payload = json.loads(request.content)
+        assert payload["provider"]["max_price"] == {"prompt": 0.2, "completion": 0.5, "request": 0}
         if mode == "timeout": raise httpx.ReadTimeout("timeout")
         if mode in {"429", "401", "402"}: return httpx.Response(int(mode), json={}, headers={"Retry-After": "120"})
         return httpx.Response(200, json={"choices": [{"message": {"content": "broken json" if mode == "bad_json" else json.dumps(result)}}], "model": "test", "usage": {"prompt_tokens": 50, "completion_tokens": 100, "cost": .001}})
