@@ -37,7 +37,7 @@ async def work_loop():
 
 @asynccontextmanager
 async def lifespan(app):
-    if settings().cookie_secure and (settings().demo_password == "clara-demo-local" or len(settings().session_secret) < 32):
+    if settings().cookie_secure and (settings().demo_password == "clara-demo-local" or settings().session_secret == "local-development-secret-change-before-publication" or len(settings().session_secret) < 32):
         raise RuntimeError("Configura credenciales seguras antes de publicar.")
     with Session() as db:
         initialize(db, settings().seed_demo)

@@ -5,7 +5,7 @@ import re
 import unicodedata
 from urllib.parse import urlparse
 from sqlalchemy import select
-from .models import Lead, Source, Job, Audit
+from .models import Lead, Source, Job, Audit, Config
 
 PERSONAL_DOMAINS = {"gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com", "yahoo.com", "icloud.com", "proton.me", "protonmail.com", "aol.com"}
 ALIASES = {
@@ -61,6 +61,8 @@ def read_csv(data):
 
 
 def ingest(db, rows, mapping=None, kind="csv", title="Importación CSV"):
+    # Serialize batch imports in PostgreSQL so concurrent copies cannot create duplicate leads/jobs.
+    db.scalar(select(Config).where(Config.key == "rules").with_for_update())
     accepted, duplicates, rejected = [], [], []
     for index, original in enumerate(rows, 2 if mapping else 1):
         row = {field: original.get(column, "") or "" for field, column in mapping.items()} if mapping else dict(original)

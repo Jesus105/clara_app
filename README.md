@@ -114,6 +114,14 @@ Las pruebas de backend cubren autorización, CSRF, importación, deduplicación,
 
 GitHub Actions ejecuta backend, migración y compilación frontend en cada push y PR. La prueba real de generación se hace aparte para evitar consumir la key desde CI.
 
+Para repetir el recorrido real en el servidor, con su contraseña configurada en `.env`:
+
+```bash
+.venv/bin/python scripts/smoke.py
+```
+
+Esta comprobación importa el CSV, espera el modelo, verifica evidencia, edita, aprueba dos veces y comprueba auditoría e idempotencia. Reutiliza los prospectos del CSV cuando ya existen. Evidencia de la entrega: [Verificación](docs/VERIFICATION.md).
+
 ## Despliegue y límites de la demo
 
 Todo corre en **Render Free**, sin un worker de pago ni disco adicional. `render.yaml` reproduce los recursos; [scripts/deploy.py](scripts/deploy.py) crea/reutiliza exclusivamente servicios con plan `free` y guarda solo identificadores en `.local/deployment.json`.
